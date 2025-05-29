@@ -108,12 +108,12 @@ const Navbar = () => {
                   <motion.button
                     key={item.id}
                     onClick={() => {
-                      scrollToSection(item.id);
                       setMenuOpen(false);
+                      setTimeout(() => scrollToSection(item.id), 300);
                     }}
                     className={`px-4 py-2 rounded-lg text-left transition-colors ${
                       activeSection === item.id
-                        ? "text-accent bg-accent/10"
+                        ? "text-cyan-500 bg-accent/10"
                         : "text-white hover:text-accent"
                     }`}
                     whileHover={{ scale: 1.03 }}
