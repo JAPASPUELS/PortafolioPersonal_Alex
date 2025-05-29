@@ -12,7 +12,7 @@ const Projects = () => {
       title: "EcoBooks",
       description:
         "Plataforma web para llevar la contabilidad de la empresa. Sistema completo con gestión de usuarios, productos, facturacion, inventario, control de proveedores y panel administrativo.",
-      image: "public/images/LoginEcobooks.png",
+      image: "/images/LoginEcobooks.png",
       technologies: [
         {
           name: "Laravel",
@@ -54,7 +54,7 @@ const Projects = () => {
       title: "Plannify",
       description:
         "Aplicación móvil nativa para Android enfocada en la planificación y gestión de tareas personales. Interfaz intuitiva con categorización de tareas y seguimiento de progreso.",
-      image: "public/images/plannify.png",
+      image: "/images/plannify.png",
       technologies: [
         {
           name: "Kotlin",
