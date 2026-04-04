@@ -123,10 +123,10 @@ const About = () => {
                     Perfil Profesional
                   </h3>
                   <p className="text-gray-300 leading-relaxed text-justify mb-6">
-                    Soy estudiante de Ing. en Software de la Universidad Técnica del
-                    Norte, con una sólida base en desarrollo de software y una pasión
-                    por crear aplicaciones móviles y web escalables. Me encanta aprender
-                    nuevas tecnologías y mejorar mis habilidades constantemente.
+                    Soy Ingeniero en Software graduado de la Universidad Técnica del Norte, 
+                    con una sólida base en desarrollo de software y una gran pasión por 
+                    crear aplicaciones móviles y web escalables. Me motiva aprender nuevas 
+                    tecnologías y perfeccionar continuamente mis habilidades profesionales.
                   </p>
 
                   {/* Formación Académica */}
@@ -139,7 +139,7 @@ const About = () => {
                       <div className="w-2 h-2 bg-cyan-400 rounded-full mt-2 flex-shrink-0" />
                       <div>
                         <h5 className="font-semibold text-white text-sm">Ingeniería en Software</h5>
-                        <p className="text-gray-400 text-xs">Universidad Técnica del Norte (En curso)</p>
+                        <p className="text-gray-400 text-xs">Universidad Técnica del Norte (2026)</p>
                       </div>
                     </motion.div>
                   </div>
