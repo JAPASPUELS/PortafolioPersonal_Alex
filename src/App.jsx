@@ -1,3 +1,5 @@
+import { LanguageProvider } from './context/LanguageContext';
+import ErrorBoundary from './components/ui/ErrorBoundary';
 import AnimatedBackground from './components/layout/AnimatedBackground';
 import Navbar from './components/layout/Navbar';
 import Home from './components/sections/Home';
@@ -8,17 +10,21 @@ import Contact from './components/sections/Contact';
 
 function App() {
   return (
-    <div className="relative">
-      <AnimatedBackground />
-      <Navbar />
-      <main>
-        <Home />
-        <About />
-        <Projects />
-        <Experience />
-        <Contact />
-      </main>
-    </div>
+    <ErrorBoundary>
+      <LanguageProvider>
+        <div className="relative">
+          <AnimatedBackground />
+          <Navbar />
+          <main>
+            <Home />
+            <About />
+            <Projects />
+            <Experience />
+            <Contact />
+          </main>
+        </div>
+      </LanguageProvider>
+    </ErrorBoundary>
   );
 }
 

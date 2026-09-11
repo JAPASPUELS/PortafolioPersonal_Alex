@@ -1,111 +1,93 @@
-import { motion } from "framer-motion";
-import { useInView } from "framer-motion";
+import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
+import { useLanguage } from "../../context/LanguageContext";
+import { containerVariants, itemVariants, badgeVariants as techVariants } from "../../utils/animations";
+
+const projectStaticData = [
+  {
+    id: 1,
+    image: "/images/LoginEcobooks.png",
+    technologies: [
+      {
+        name: "Laravel",
+        color: "from-red-600 to-red-400",
+        bgColor: "bg-red-800",
+        borderColor: "border-red-600",
+      },
+      {
+        name: "PHP",
+        color: "from-indigo-600 to-purple-400",
+        bgColor: "bg-indigo-800",
+        borderColor: "border-indigo-600",
+      },
+      {
+        name: "JavaScript",
+        color: "from-yellow-600 to-yellow-400",
+        bgColor: "bg-yellow-800",
+        borderColor: "border-yellow-600",
+      },
+      {
+        name: "Postgres",
+        color: "from-orange-600 to-yellow-400",
+        bgColor: "bg-orange-800",
+        borderColor: "border-orange-600",
+      },
+      {
+        name: "Bootstrap",
+        color: "from-purple-600 to-purple-400",
+        bgColor: "bg-purple-800",
+        borderColor: "border-purple-600",
+      },
+    ],
+    codeLink: "https://github.com/JAPASPUELS/EcoBooks_Jetstream.git",
+    type: "web",
+    icon: "🌱",
+  },
+  {
+    id: 2,
+    image: "/images/plannify.png",
+    technologies: [
+      {
+        name: "Kotlin",
+        color: "from-orange-600 to-orange-400",
+        bgColor: "bg-orange-800",
+        borderColor: "border-orange-600",
+      },
+      {
+        name: "Android",
+        color: "from-green-600 to-green-400",
+        bgColor: "bg-green-800",
+        borderColor: "border-green-600",
+      },
+      {
+        name: "SQLite",
+        color: "from-gray-600 to-gray-400",
+        bgColor: "bg-gray-800",
+        borderColor: "border-gray-600",
+      },
+      {
+        name: "Material Design",
+        color: "from-blue-600 to-blue-400",
+        bgColor: "bg-blue-800",
+        borderColor: "border-blue-600",
+      },
+    ],
+    codeLink: "https://github.com/JAPASPUELS/App_de_Gestion_Plannify.git",
+    type: "mobile",
+    icon: "📱",
+  },
+];
 
 const Projects = () => {
+  const { t } = useLanguage();
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
 
-  const projects = [
-    {
-      id: 1,
-      title: "EcoBooks",
-      description:
-        "Plataforma web para llevar la contabilidad de la empresa. Sistema completo con gestión de usuarios, productos, facturacion, inventario, control de proveedores y panel administrativo.",
-      image: "/images/LoginEcobooks.png",
-      technologies: [
-        {
-          name: "Laravel",
-          color: "from-red-600 to-red-400",
-          bgColor: "bg-red-800",
-          borderColor: "border-red-600",
-        },
-        {
-          name: "PHP",
-          color: "from-indigo-600 to-purple-400",
-          bgColor: "bg-indigo-800",
-          borderColor: "border-indigo-600",
-        },
-        {
-          name: "JavaScript",
-          color: "from-yellow-600 to-yellow-400",
-          bgColor: "bg-yellow-800",
-          borderColor: "border-yellow-600",
-        },
-        {
-          name: "Postgres",
-          color: "from-orange-600 to-yellow-400",
-          bgColor: "bg-orange-800",
-          borderColor: "border-orange-600",
-        },
-        {
-          name: "Bootstrap",
-          color: "from-purple-600 to-purple-400",
-          bgColor: "bg-purple-800",
-          borderColor: "border-purple-600",
-        },
-      ],
-      codeLink: "https://github.com/JAPASPUELS/EcoBooks_Jetstream.git",
-      type: "web",
-      icon: "🌱",
-    },
-    {
-      id: 2,
-      title: "Plannify",
-      description:
-        "Aplicación móvil nativa para Android enfocada en la planificación y gestión de tareas personales. Interfaz intuitiva con categorización de tareas y seguimiento de progreso.",
-      image: "/images/plannify.png",
-      technologies: [
-        {
-          name: "Kotlin",
-          color: "from-orange-600 to-orange-400",
-          bgColor: "bg-orange-800",
-          borderColor: "border-orange-600",
-        },
-        {
-          name: "Android",
-          color: "from-green-600 to-green-400",
-          bgColor: "bg-green-800",
-          borderColor: "border-green-600",
-        },
-        {
-          name: "SQLite",
-          color: "from-gray-600 to-gray-400",
-          bgColor: "bg-gray-800",
-          borderColor: "border-gray-600",
-        },
-        {
-          name: "Material Design",
-          color: "from-blue-600 to-blue-400",
-          bgColor: "bg-blue-800",
-          borderColor: "border-blue-600",
-        },
-      ],
-      codeLink: "https://github.com/JAPASPUELS/App_de_Gestion_Plannify.git",
-      type: "mobile",
-      icon: "📱",
-    },
-  ];
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        delayChildren: 0.2,
-        staggerChildren: 0.3,
-      },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 30 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.6, ease: "easeOut" },
-    },
-  };
+  const projects = projectStaticData.map((item, idx) => ({
+    ...item,
+    title: t.projects.items[idx]?.title || "",
+    description: t.projects.items[idx]?.description || "",
+  }));
 
   const projectCardVariants = {
     hidden: { opacity: 0, scale: 0.9, y: 50 },
@@ -114,15 +96,6 @@ const Projects = () => {
       scale: 1,
       y: 0,
       transition: { duration: 0.7, ease: "easeOut" },
-    },
-  };
-
-  const techVariants = {
-    hidden: { opacity: 0, scale: 0.8 },
-    visible: {
-      opacity: 1,
-      scale: 1,
-      transition: { duration: 0.4, ease: "easeOut" },
     },
   };
 
@@ -154,7 +127,7 @@ const Projects = () => {
             {/* Título principal */}
             <motion.div variants={itemVariants} className="text-center mb-16">
               <h2 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
-                Proyectos
+                {t.projects.title}
               </h2>
               <motion.div
                 className="w-20 h-1 bg-gradient-to-r from-cyan-400 to-blue-400 mx-auto rounded-full"
@@ -169,7 +142,7 @@ const Projects = () => {
               className="grid lg:grid-cols-2 gap-8 mb-12"
               variants={containerVariants}
             >
-              {projects.map((project, index) => (
+              {projects.map((project) => (
                 <motion.div
                   key={project.id}
                   variants={projectCardVariants}
@@ -202,7 +175,7 @@ const Projects = () => {
                             : "bg-green-500/20 text-green-300 border border-green-400/30"
                         }`}
                       >
-                        {project.type === "web" ? "Web App" : "Mobile App"}
+                        {project.type === "web" ? t.projects.webBadge : t.projects.mobileBadge}
                       </span>
                     </div>
 
@@ -225,7 +198,7 @@ const Projects = () => {
                     {/* Tecnologías */}
                     <div className="mb-6">
                       <h4 className="text-sm font-semibold mb-3 text-cyan-400">
-                        Tecnologías:
+                        {t.projects.techTitle}
                       </h4>
                       <motion.div
                         className="flex flex-wrap gap-2"
@@ -277,7 +250,7 @@ const Projects = () => {
                           className="w-5 h-5 object-contain"
                         />
                         <span className="text-sm font-medium">
-                          Ver Repositorio
+                          {t.projects.viewCode}
                         </span>
                       </motion.a>
                     </div>
@@ -292,10 +265,10 @@ const Projects = () => {
               className="mb-8 grid grid-cols-2 md:grid-cols-4 gap-4"
             >
               {[
-                { label: "Proyectos", value: "2+", icon: "🚀" },
-                { label: "Tecnologías", value: "9+", icon: "⚡" },
-                { label: "Plataformas", value: "2", icon: "💻" },
-                { label: "En desarrollo", value: "∞", icon: "🔄" },
+                { label: t.projects.stats.projects, value: "2+", icon: "🚀" },
+                { label: t.projects.stats.technologies, value: "9+", icon: "⚡" },
+                { label: t.projects.stats.platforms, value: "2", icon: "💻" },
+                { label: t.projects.stats.inDevelopment, value: "∞", icon: "🔄" },
               ].map((stat, index) => (
                 <motion.div
                   key={stat.label}

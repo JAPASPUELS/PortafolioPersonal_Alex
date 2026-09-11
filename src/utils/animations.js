@@ -140,3 +140,31 @@ export const hoverGlow = {
   boxShadow: "0 0 20px rgba(59, 130, 246, 0.5)",
   transition: { duration: 0.3 }
 };
+
+export const cardVariants = {
+  hidden: { opacity: 0, y: 30, scale: 0.95 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: { duration: 0.6, ease: "easeOut" }
+  }
+};
+
+export const badgeVariants = {
+  hidden: { opacity: 0, scale: 0.8 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    transition: { duration: 0.4, ease: "easeOut" }
+  }
+};
+
+export const certificateVariants = {
+  hidden: { opacity: 0, x: -20 },
+  visible: {
+    opacity: 1,
+    x: 0,
+    transition: { duration: 0.5, ease: "easeOut" }
+  }
+};

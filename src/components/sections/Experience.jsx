@@ -1,95 +1,18 @@
-import { motion } from "framer-motion";
-import { useInView } from "framer-motion";
+import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
+import { useLanguage } from "../../context/LanguageContext";
+import {
+  containerVariants,
+  itemVariants,
+  badgeVariants as techVariants,
+} from "../../utils/animations";
 
 const Experience = () => {
+  const { t } = useLanguage();
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
 
-  const experiences = [
-    {
-      id: 1,
-      company: "Debisoft C.A.",
-      position: "Desarrollador (Practicante)",
-      location: "Ibarra, Ecuador",
-      period: "2024",
-      type: "Prácticas Profesionales",
-      link: "https://debi.ec",
-      description:
-        "Participé en proyectos de desarrollo tanto en frontend como backend, trabajando en equipo y aplicando metodologías ágiles.",
-      technologies: [
-        "CodeIgniter",
-        "Angular",
-        "PostgreSQL",
-        "JavaScript",
-        "C#",
-      ],
-      achievements: [
-        "Desarrollo de funcionalidades completas de extremo a extremo",
-        "Colaboración efectiva con el equipo de desarrollo",
-        "Implementación de mejores prácticas de código",
-        "Participación en reuniones de planificación y revisión",
-      ],
-      skills: [
-        "Trabajo en equipo",
-        "Comunicación efectiva",
-        "Resolución de problemas",
-        "Adaptabilidad",
-      ],
-      icon: "💼",
-      color: "from-blue-600 to-cyan-400",
-      bgColor: "bg-blue-900/20",
-      borderColor: "border-blue-500/30",
-    },
-    {
-      id: 2,
-      company: "EcoLimpieza",
-      position: "Desarrollador (Freelance)",
-      location: "Proyecto independiente",
-      period: "2024",
-      type: "Proyecto Freelance",
-      link: "https://www.facebook.com/productosecolimpiezaec/",
-      description:
-        "Desarrollo del sistema EcoBooks, una aplicación de gestión contable diseñada para llevar la contabilidad de la empresa. Sistema completo con funcionalidades de facturación, reportes y administración financiera, control de inventario, registro de proveedores.",
-      technologies: ["Laravel", "PHP", "PostgreSQL", "JavaScript", "Bootstrap"],
-      achievements: [
-        "Diseño y desarrollo completo del sistema EcoBooks",
-        "Implementación de módulos de gestión contable",
-        "Desarrollo de reportes financieros automatizados",
-        "Entrega exitosa del proyecto dentro del plazo establecido",
-      ],
-      skills: [
-        "Gestión de proyectos",
-        "Comunicación con cliente",
-        "Análisis de requerimientos",
-        "Autonomía",
-      ],
-      icon: "🚀",
-      color: "from-green-600 to-emerald-400",
-      bgColor: "bg-green-900/20",
-      borderColor: "border-green-500/30",
-    },
-  ];
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        delayChildren: 0.2,
-        staggerChildren: 0.3,
-      },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 30 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.6, ease: "easeOut" },
-    },
-  };
+  const experiences = t.experience.items;
 
   const cardVariants = {
     hidden: { opacity: 0, x: -50 },
@@ -97,15 +20,6 @@ const Experience = () => {
       opacity: 1,
       x: 0,
       transition: { duration: 0.8, ease: "easeOut" },
-    },
-  };
-
-  const techVariants = {
-    hidden: { opacity: 0, scale: 0.8 },
-    visible: {
-      opacity: 1,
-      scale: 1,
-      transition: { duration: 0.4, ease: "easeOut" },
     },
   };
 
@@ -137,7 +51,7 @@ const Experience = () => {
             {/* Título principal */}
             <motion.div variants={itemVariants} className="text-center mb-16">
               <h2 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
-                Experiencia Profesional
+                {t.experience.title}
               </h2>
               <motion.div
                 className="w-20 h-1 bg-gradient-to-r from-cyan-400 to-blue-400 mx-auto rounded-full"
@@ -232,10 +146,10 @@ const Experience = () => {
                                 clipRule="evenodd"
                               />
                             </svg>
-                            Logros Principales
+                            {t.experience.achievementsTitle}
                           </h4>
                           <ul className="space-y-2">
-                            {exp.achievements.map((achievement, i) => (
+                            {(exp.achievements || []).map((achievement, i) => (
                               <motion.li
                                 key={i}
                                 className="flex items-start space-x-2 text-gray-300 text-sm"
@@ -266,10 +180,10 @@ const Experience = () => {
                             >
                               <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
-                            Habilidades Blandas
+                            {t.experience.skillsTitle}
                           </h4>
                           <div className="flex flex-wrap gap-2 mb-4">
-                            {exp.skills.map((skill, i) => (
+                            {(exp.skills || []).map((skill, i) => (
                               <motion.span
                                 key={i}
                                 className="px-3 py-1 bg-slate-700/50 text-gray-300 rounded-full text-xs border border-slate-600/50"
@@ -297,7 +211,7 @@ const Experience = () => {
                       {/* Tecnologías utilizadas */}
                       <div className="mt-6 pt-4 border-t border-slate-700/50">
                         <h4 className="text-sm font-semibold mb-3 text-gray-400">
-                          Tecnologías Utilizadas
+                          {t.experience.techTitle}
                         </h4>
                         <motion.div
                           className="flex flex-wrap gap-2"
@@ -305,7 +219,7 @@ const Experience = () => {
                           initial="hidden"
                           animate={isInView ? "visible" : "hidden"}
                         >
-                          {exp.technologies.map((tech, i) => (
+                          {(exp.technologies || []).map((tech, i) => (
                             <motion.span
                               key={i}
                               variants={techVariants}
@@ -330,7 +244,7 @@ const Experience = () => {
                             rel="noopener noreferrer"
                             className="inline-flex items-center px-4 py-2 border border-cyan-500 text-cyan-300 hover:text-white hover:bg-cyan-600 rounded-lg transition-colors duration-300"
                           >
-                            🌐 Visitar sitio web
+                            {t.experience.visitWebsite}
                           </a>
                         </div>
                       )}
@@ -356,9 +270,9 @@ const Experience = () => {
                   transition={{ delay: 1.8, duration: 0.6 }}
                 >
                   <div className="text-3xl mb-2">🎯</div>
-                  <div className="text-2xl font-bold text-white mb-1">2+</div>
+                  <div className="text-2xl font-bold text-white mb-1">4+</div>
                   <div className="text-gray-400 text-sm">
-                    Proyectos Completados
+                    {t.experience.stats.experiences}
                   </div>
                 </motion.div>
 
@@ -373,10 +287,10 @@ const Experience = () => {
                 >
                   <div className="text-3xl mb-2">⚡</div>
                   <div className="text-2xl font-bold text-white mb-1">
-                    Full Stack
+                    {t.experience.stats.fullstack}
                   </div>
                   <div className="text-gray-400 text-sm">
-                    Desarrollo Completo
+                    {t.experience.stats.fullstackDesc}
                   </div>
                 </motion.div>
 
@@ -390,8 +304,8 @@ const Experience = () => {
                   transition={{ delay: 2.0, duration: 0.6 }}
                 >
                   <div className="text-3xl mb-2">🤝</div>
-                  <div className="text-2xl font-bold text-white mb-1">100%</div>
-                  <div className="text-gray-400 text-sm">Trabajo en Equipo</div>
+                  <div className="text-2xl font-bold text-white mb-1">{t.experience.stats.teamwork}</div>
+                  <div className="text-gray-400 text-sm">{t.experience.stats.teamworkDesc}</div>
                 </motion.div>
               </div>
             </motion.div>
