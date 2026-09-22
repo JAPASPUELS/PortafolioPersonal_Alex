@@ -1,316 +1,196 @@
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
 import { useLanguage } from "../../context/LanguageContext";
-import {
-  containerVariants,
-  itemVariants,
-  badgeVariants as techVariants,
-} from "../../utils/animations";
+import { useTheme } from "../../context/ThemeContext";
+import { playMinecraftClick } from "../../utils/audio";
 
+/**
+ * ============================================================================
+ * Componente: Experience (Libro de Misiones & Expediciones)
+ * Explicación: Renderiza la trayectoria laboral como un Quest Log de misiones
+ * completadas y activas, adaptándose a los temas Claro y Oscuro y traduciéndose
+ * por completo entre Español e Inglés.
+ * ============================================================================
+ */
 const Experience = () => {
   const { t } = useLanguage();
+  const { isDark } = useTheme();
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
 
   const experiences = t.experience.items;
 
-  const cardVariants = {
-    hidden: { opacity: 0, x: -50 },
-    visible: {
-      opacity: 1,
-      x: 0,
-      transition: { duration: 0.8, ease: "easeOut" },
-    },
+  /**
+   * Método: handleLinkClick
+   * Explicación: Reproduce sonido de click al abrir el enlace externo de la empresa.
+   */
+  const handleLinkClick = () => {
+    playMinecraftClick();
   };
 
   return (
-    <section
-      id="experience"
-      ref={ref}
-      className="min-h-screen text-white px-6 py-20"
-    >
-      <div className="max-w-7xl mx-auto">
-        {/* Contenedor principal con glassmorphism */}
-        <motion.div
-          className="relative border border-cyan-500/30 bg-gradient-to-br from-cyan-950/40 to-slate-900/40 backdrop-blur-xl rounded-2xl p-8 md:p-12 shadow-2xl overflow-hidden"
-          initial={{ opacity: 0, y: 50 }}
-          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
-          transition={{ duration: 0.8 }}
-        >
-          {/* Efectos de fondo */}
-          <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/5 to-blue-500/5 rounded-2xl" />
-          <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-cyan-400/10 to-blue-400/10 rounded-full blur-3xl" />
-          <div className="absolute bottom-0 left-0 w-32 h-32 bg-gradient-to-tr from-purple-400/10 to-pink-400/10 rounded-full blur-3xl" />
-
-          <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            animate={isInView ? "visible" : "hidden"}
-            className="relative z-10"
+    <section id="experience" ref={ref} className="min-h-screen px-2.5 sm:px-4 py-16 sm:py-20">
+      <div className="max-w-6xl mx-auto">
+        
+        {/* ====================================================================
+            Sección: Título Temático
+            ==================================================================== */}
+        <div className="text-center mb-8 sm:mb-10">
+          <span
+            className={`font-['VT323'] text-lg sm:text-xl mc-text-shadow ${
+              isDark ? "text-[#ffaa00]" : "text-[#995c00]"
+            }`}
           >
-            {/* Título principal */}
-            <motion.div variants={itemVariants} className="text-center mb-16">
-              <h2 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
-                {t.experience.title}
-              </h2>
-              <motion.div
-                className="w-20 h-1 bg-gradient-to-r from-cyan-400 to-blue-400 mx-auto rounded-full"
-                initial={{ width: 0 }}
-                animate={isInView ? { width: 80 } : { width: 0 }}
-                transition={{ delay: 0.5, duration: 0.8 }}
-              />
-            </motion.div>
+            {t.experience.subtitleTag || "[ LIBRO DE MISIONES // QUEST LOG & EXP ]"}
+          </span>
+          <h2
+            className={`font-['VT323'] text-4xl sm:text-5xl md:text-6xl mc-text-shadow mt-1 ${
+              isDark ? "text-white" : "text-[#1b1924]"
+            }`}
+          >
+            {t.experience.title.toUpperCase()}
+          </h2>
+          <div className="w-24 sm:w-32 h-1.5 bg-[#ffaa00] mx-auto mt-2 shadow-[0_0_8px_#ffaa00]" />
+        </div>
 
-            {/* Timeline de experiencias */}
-            <div className="relative">
-              {/* Línea de tiempo central continua */}
-              <div className="absolute left-6 md:left-1/2 md:transform md:-translate-x-px top-0 bottom-0 w-px bg-gradient-to-b from-cyan-400 to-blue-400 opacity-30" />
-
-              <div className="grid md:grid-cols-2 gap-8 md:gap-16">
-                {experiences.map((exp, index) => (
-                  <motion.div
-                    key={exp.id}
-                    variants={cardVariants}
-                    className={`relative ${
-                      index % 2 === 0 ? "md:pr-8" : "md:pl-8 md:col-start-2"
-                    }`}
-                  >
-                    {/* Punto de la línea de tiempo */}
-                    <motion.div
-                      className={`absolute w-4 h-4 bg-gradient-to-r from-cyan-400 to-blue-400 rounded-full border-2 border-slate-900 z-10 ${
-                        index % 2 === 0
-                          ? "left-4 md:right-0 md:left-auto md:transform md:translate-x-2"
-                          : "left-4 md:left-0 md:transform md:-translate-x-2"
-                      } top-8`}
-                      initial={{ scale: 0 }}
-                      animate={isInView ? { scale: 1 } : { scale: 0 }}
-                      transition={{ delay: 0.5 + index * 0.2, duration: 0.6 }}
-                    />
-
-                    {/* Tarjeta de experiencia */}
-                    <motion.div
-                      className={`ml-12 md:ml-0 p-6 ${exp.bgColor} ${exp.borderColor} border rounded-xl backdrop-blur-sm`}
-                      whileHover={{
-                        scale: 1.02,
-                        boxShadow: "0 20px 40px rgba(0, 0, 0, 0.3)",
-                      }}
-                      transition={{ duration: 0.3 }}
-                    >
-                      {/* Header de la experiencia */}
-                      <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
-                        <div className="flex items-center space-x-3 mb-2 md:mb-0">
-                          <span className="text-2xl">{exp.icon}</span>
-                          <div>
-                            <h3
-                              className={`text-xl font-bold bg-gradient-to-r ${exp.color} bg-clip-text text-transparent`}
-                            >
-                              {exp.position}
-                            </h3>
-                            <p className="text-white font-semibold">
-                              {exp.company}
-                            </p>
-                            <p className="text-gray-400 text-sm">
-                              {exp.location}
-                            </p>
-                          </div>
-                        </div>
-                        <div className="text-center">
-                          <span
-                            className={`inline-block px-3 py-1 rounded-full text-xs font-medium bg-gradient-to-r ${exp.color} text-white`}
-                          >
-                            {exp.type}
-                          </span>
-                          <p className="text-gray-400 text-sm mt-1">
-                            {exp.period}
-                          </p>
-                        </div>
+        {/* ====================================================================
+            Sección: Panel GUI de Misiones Adaptable al Tema y Móviles
+            ==================================================================== */}
+        <div className="mc-panel-theme p-3.5 sm:p-6 md:p-8 relative">
+          
+          <div className="space-y-6 sm:space-y-8">
+            {experiences.map((exp) => (
+              <div
+                key={exp.id}
+                className="mc-card-inner p-4 sm:p-6 shadow-2xl relative"
+              >
+                {/* Cabecera de la Misión con distribución flexible */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b-2 border-black pb-4 mb-5">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-[#23202e] border-2 border-black flex items-center justify-center text-xl sm:text-2xl shadow-inner flex-shrink-0">
+                      {exp.icon || "🏢"}
+                    </div>
+                    <div>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="font-['VT323'] text-2xl sm:text-3xl text-[#55ffff] mc-text-shadow">
+                          {exp.company}
+                        </span>
+                        <span className="bg-[#246b22] text-[#ffffa0] border border-black px-1.5 sm:px-2 py-0.5 text-xs font-mono">
+                          {t.experience.inProgress || "Misión en Progreso"}
+                        </span>
                       </div>
-
-                      {/* Descripción */}
-                      <p className="text-gray-300 mb-6 leading-relaxed text-justify">
-                        {exp.description}
+                      <p
+                        className={`text-xs sm:text-sm font-semibold font-sans ${
+                          isDark ? "text-white" : "text-[#111111]"
+                        }`}
+                      >
+                        {exp.position}
                       </p>
+                    </div>
+                  </div>
 
-                      <div className="grid md:grid-cols-2 gap-6">
-                        {/* Logros */}
-                        <div>
-                          <h4 className="text-lg font-semibold mb-3 text-cyan-400 flex items-center">
-                            <svg
-                              className="w-5 h-5 mr-2"
-                              fill="currentColor"
-                              viewBox="0 0 20 20"
-                            >
-                              <path
-                                fillRule="evenodd"
-                                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                                clipRule="evenodd"
-                              />
-                            </svg>
-                            {t.experience.achievementsTitle}
-                          </h4>
-                          <ul className="space-y-2">
-                            {(exp.achievements || []).map((achievement, i) => (
-                              <motion.li
-                                key={i}
-                                className="flex items-start space-x-2 text-gray-300 text-sm"
-                                initial={{ opacity: 0, x: -10 }}
-                                animate={
-                                  isInView
-                                    ? { opacity: 1, x: 0 }
-                                    : { opacity: 0, x: -10 }
-                                }
-                                transition={{
-                                  delay: 1 + index * 0.2 + i * 0.1,
-                                }}
-                              >
-                                <div className="w-1.5 h-1.5 bg-green-400 rounded-full mt-2 flex-shrink-0" />
-                                <span>{achievement}</span>
-                              </motion.li>
-                            ))}
-                          </ul>
-                        </div>
+                  {/* Coordenadas de la Misión y Período */}
+                  <div className="text-left sm:text-right font-mono text-xs pl-13 sm:pl-0">
+                    <div className="text-[#ffaa00] font-bold">📍 {exp.location}</div>
+                    <div className={isDark ? "text-[#888888]" : "text-[#444444]"}>{exp.period}</div>
+                  </div>
+                </div>
 
-                        {/* Habilidades desarrolladas */}
-                        <div>
-                          <h4 className="text-lg font-semibold mb-3 text-cyan-400 flex items-center">
-                            <svg
-                              className="w-5 h-5 mr-2"
-                              fill="currentColor"
-                              viewBox="0 0 20 20"
-                            >
-                              <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                            {t.experience.skillsTitle}
-                          </h4>
-                          <div className="flex flex-wrap gap-2 mb-4">
-                            {(exp.skills || []).map((skill, i) => (
-                              <motion.span
-                                key={i}
-                                className="px-3 py-1 bg-slate-700/50 text-gray-300 rounded-full text-xs border border-slate-600/50"
-                                initial={{ opacity: 0, scale: 0.8 }}
-                                animate={
-                                  isInView
-                                    ? { opacity: 1, scale: 1 }
-                                    : { opacity: 0, scale: 0.8 }
-                                }
-                                transition={{
-                                  delay: 1.2 + index * 0.2 + i * 0.1,
-                                }}
-                                whileHover={{
-                                  scale: 1.05,
-                                  backgroundColor: "rgba(51, 65, 85, 0.7)",
-                                }}
-                              >
-                                {skill}
-                              </motion.span>
-                            ))}
-                          </div>
-                        </div>
+                {/* Resumen de la Misión */}
+                <p
+                  className={`text-sm sm:text-base font-sans leading-relaxed mb-6 ${
+                    isDark ? "text-[#d8d8d8]" : "text-[#222222]"
+                  }`}
+                >
+                  {exp.description}
+                </p>
+
+                {/* Subsección: Objetivos Cumplidos */}
+                <div className="mb-6">
+                  <span className="font-['VT323'] text-xl text-[#55ff55] mc-text-shadow block mb-2">
+                    {t.experience.achievementsTitle || "✦ Objetivos de Misión Cumplidos:"}
+                  </span>
+                  <div className="space-y-2">
+                    {exp.achievements.map((item, idx) => (
+                      <div
+                        key={idx}
+                        className={`flex items-start gap-2.5 text-xs sm:text-sm font-sans p-2.5 border border-black/80 ${
+                          isDark ? "bg-[#1a1822] text-[#cccccc]" : "bg-[#ebebeb] text-[#1a1a1a]"
+                        }`}
+                      >
+                        <span className="text-[#55ff55] font-mono font-bold flex-shrink-0">
+                          [✔]
+                        </span>
+                        <span>{item}</span>
                       </div>
+                    ))}
+                  </div>
+                </div>
 
-                      {/* Tecnologías utilizadas */}
-                      <div className="mt-6 pt-4 border-t border-slate-700/50">
-                        <h4 className="text-sm font-semibold mb-3 text-gray-400">
-                          {t.experience.techTitle}
-                        </h4>
-                        <motion.div
-                          className="flex flex-wrap gap-2"
-                          variants={containerVariants}
-                          initial="hidden"
-                          animate={isInView ? "visible" : "hidden"}
+                {/* Subsección: Herramientas y Encantamientos */}
+                <div className="flex flex-wrap items-center justify-between gap-4 pt-4 border-t-2 border-black">
+                  <div>
+                    <span
+                      className={`font-['VT323'] text-base block mb-1.5 ${
+                        isDark ? "text-[#aaaaaa]" : "text-[#444444]"
+                      }`}
+                    >
+                      {t.experience.toolsTitle || "Herramientas y Encantamientos:"}
+                    </span>
+                    <div className="flex flex-wrap gap-1.5">
+                      {exp.technologies.map((tech) => (
+                        <span
+                          key={tech}
+                          className="bg-[#2a2736] border border-black px-2.5 py-0.5 text-xs font-mono text-[#55ffff]"
                         >
-                          {(exp.technologies || []).map((tech, i) => (
-                            <motion.span
-                              key={i}
-                              variants={techVariants}
-                              className={`px-3 py-1 bg-gradient-to-r ${exp.color} text-white rounded-full text-xs font-medium`}
-                              whileHover={{ scale: 1.1 }}
-                              style={{
-                                transitionDelay: `${
-                                  1.5 + index * 0.2 + i * 0.05
-                                }s`,
-                              }}
-                            >
-                              {tech}
-                            </motion.span>
-                          ))}
-                        </motion.div>
-                      </div>
-                      {exp.link && (
-                        <div className="mt-6 text-center">
-                          <a
-                            href={exp.link}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center px-4 py-2 border border-cyan-500 text-cyan-300 hover:text-white hover:bg-cyan-600 rounded-lg transition-colors duration-300"
-                          >
-                            {t.experience.visitWebsite}
-                          </a>
-                        </div>
-                      )}
-                    </motion.div>
-                  </motion.div>
-                ))}
+                          {tech}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  {exp.link && (
+                    <a
+                      href={exp.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={handleLinkClick}
+                      className="mc-btn text-base py-1.5 px-4 flex items-center gap-2"
+                    >
+                      <span>🌐</span>
+                      <span>{t.experience.visitWebsite || "Sitio Oficial"}</span>
+                    </a>
+                  )}
+                </div>
+
               </div>
+            ))}
+          </div>
+
+          {/* Estadísticas de la Expedición */}
+          <div className="mt-8 pt-6 border-t-2 border-black grid grid-cols-1 sm:grid-cols-3 gap-3 text-center">
+            <div className="mc-card-inner p-3">
+              <span className="font-['VT323'] text-2xl text-[#55ff55]">100%</span>
+              <p className={`text-xs font-sans ${isDark ? "text-[#888888]" : "text-[#444444]"}`}>
+                {t.experience.stats.teamworkDesc}
+              </p>
             </div>
+            <div className="mc-card-inner p-3">
+              <span className="font-['VT323'] text-2xl text-[#55ffff]">Full Stack</span>
+              <p className={`text-xs font-sans ${isDark ? "text-[#888888]" : "text-[#444444]"}`}>
+                {t.experience.stats.fullstackDesc}
+              </p>
+            </div>
+            <div className="mc-card-inner p-3">
+              <span className="font-['VT323'] text-2xl text-[#ffaa00]">24/7</span>
+              <p className={`text-xs font-sans ${isDark ? "text-[#888888]" : "text-[#444444]"}`}>
+                {t.experience.uptime || "Alta Disponibilidad en Producción"}
+              </p>
+            </div>
+          </div>
 
-            {/* Summary estadístico */}
-            <motion.div
-              variants={itemVariants}
-              className="mt-12 pt-8 border-t border-slate-700/30"
-            >
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <motion.div
-                  className="text-center p-6 bg-slate-800/30 rounded-xl border border-slate-700/50"
-                  whileHover={{ scale: 1.05 }}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={
-                    isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }
-                  }
-                  transition={{ delay: 1.8, duration: 0.6 }}
-                >
-                  <div className="text-3xl mb-2">🎯</div>
-                  <div className="text-2xl font-bold text-white mb-1">4+</div>
-                  <div className="text-gray-400 text-sm">
-                    {t.experience.stats.experiences}
-                  </div>
-                </motion.div>
+        </div>
 
-                <motion.div
-                  className="text-center p-6 bg-slate-800/30 rounded-xl border border-slate-700/50"
-                  whileHover={{ scale: 1.05 }}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={
-                    isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }
-                  }
-                  transition={{ delay: 1.9, duration: 0.6 }}
-                >
-                  <div className="text-3xl mb-2">⚡</div>
-                  <div className="text-2xl font-bold text-white mb-1">
-                    {t.experience.stats.fullstack}
-                  </div>
-                  <div className="text-gray-400 text-sm">
-                    {t.experience.stats.fullstackDesc}
-                  </div>
-                </motion.div>
-
-                <motion.div
-                  className="text-center p-6 bg-slate-800/30 rounded-xl border border-slate-700/50"
-                  whileHover={{ scale: 1.05 }}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={
-                    isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }
-                  }
-                  transition={{ delay: 2.0, duration: 0.6 }}
-                >
-                  <div className="text-3xl mb-2">🤝</div>
-                  <div className="text-2xl font-bold text-white mb-1">{t.experience.stats.teamwork}</div>
-                  <div className="text-gray-400 text-sm">{t.experience.stats.teamworkDesc}</div>
-                </motion.div>
-              </div>
-            </motion.div>
-          </motion.div>
-        </motion.div>
       </div>
     </section>
   );

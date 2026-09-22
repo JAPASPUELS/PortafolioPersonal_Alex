@@ -1,298 +1,256 @@
 import { motion, useInView } from "framer-motion";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { useLanguage } from "../../context/LanguageContext";
-import { containerVariants, itemVariants, badgeVariants as techVariants } from "../../utils/animations";
+import { useTheme } from "../../context/ThemeContext";
+import { playMinecraftClick, playMinecraftExp } from "../../utils/audio";
 
-const projectStaticData = [
+/**
+ * ============================================================================
+ * Constante: projectBaseData
+ * Explicación: Datos base de los proyectos (imágenes, repositorios y tecnologías)
+ * que se enriquecen dinámicamente con los textos traducidos del diccionario i18n.
+ * ============================================================================
+ */
+const projectBaseData = [
   {
     id: 1,
     image: "/images/LoginEcobooks.png",
-    technologies: [
-      {
-        name: "Laravel",
-        color: "from-red-600 to-red-400",
-        bgColor: "bg-red-800",
-        borderColor: "border-red-600",
-      },
-      {
-        name: "PHP",
-        color: "from-indigo-600 to-purple-400",
-        bgColor: "bg-indigo-800",
-        borderColor: "border-indigo-600",
-      },
-      {
-        name: "JavaScript",
-        color: "from-yellow-600 to-yellow-400",
-        bgColor: "bg-yellow-800",
-        borderColor: "border-yellow-600",
-      },
-      {
-        name: "Postgres",
-        color: "from-orange-600 to-yellow-400",
-        bgColor: "bg-orange-800",
-        borderColor: "border-orange-600",
-      },
-      {
-        name: "Bootstrap",
-        color: "from-purple-600 to-purple-400",
-        bgColor: "bg-purple-800",
-        borderColor: "border-purple-600",
-      },
-    ],
-    codeLink: "https://github.com/JAPASPUELS/EcoBooks_Jetstream.git",
-    type: "web",
     icon: "🌱",
+    codeLink: "https://github.com/JAPASPUELS/EcoBooks_Jetstream.git",
+    technologies: ["Laravel", "PHP", "PostgreSQL", "JavaScript", "Bootstrap"],
+    rarityKey: "legendary",
+    rarityColor: "#ffaa00",
   },
   {
     id: 2,
     image: "/images/plannify.png",
-    technologies: [
-      {
-        name: "Kotlin",
-        color: "from-orange-600 to-orange-400",
-        bgColor: "bg-orange-800",
-        borderColor: "border-orange-600",
-      },
-      {
-        name: "Android",
-        color: "from-green-600 to-green-400",
-        bgColor: "bg-green-800",
-        borderColor: "border-green-600",
-      },
-      {
-        name: "SQLite",
-        color: "from-gray-600 to-gray-400",
-        bgColor: "bg-gray-800",
-        borderColor: "border-gray-600",
-      },
-      {
-        name: "Material Design",
-        color: "from-blue-600 to-blue-400",
-        bgColor: "bg-blue-800",
-        borderColor: "border-blue-600",
-      },
-    ],
-    codeLink: "https://github.com/JAPASPUELS/App_de_Gestion_Plannify.git",
-    type: "mobile",
     icon: "📱",
+    codeLink: "https://github.com/JAPASPUELS/App_de_Gestion_Plannify.git",
+    technologies: ["Kotlin", "Android", "SQLite", "Material Design"],
+    rarityKey: "epic",
+    rarityColor: "#c77dff",
   },
 ];
 
+/**
+ * ============================================================================
+ * Componente: Projects (Cofre de Proyectos & Mesa de Crafteo)
+ * Explicación: Presenta las aplicaciones como ítems de inventario con Lore,
+ * encantamientos de arquitectura, tecnologías de crafteo y enlaces a GitHub,
+ * totalmente adaptado al modo Claro/Oscuro e internacionalizado (ES/EN).
+ * ============================================================================
+ */
 const Projects = () => {
   const { t } = useLanguage();
+  const { isDark } = useTheme();
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
+  const [activeProjectId, setActiveProjectId] = useState(1);
 
-  const projects = projectStaticData.map((item, idx) => ({
-    ...item,
-    title: t.projects.items[idx]?.title || "",
-    description: t.projects.items[idx]?.description || "",
-  }));
+  // Proyecto base activo y su correspondiente objeto de traducción
+  const baseActive = projectBaseData.find((p) => p.id === activeProjectId) || projectBaseData[0];
+  const translatedItem = t.projects.items.find((item) => item.id === activeProjectId) || t.projects.items[0];
 
-  const projectCardVariants = {
-    hidden: { opacity: 0, scale: 0.9, y: 50 },
-    visible: {
-      opacity: 1,
-      scale: 1,
-      y: 0,
-      transition: { duration: 0.7, ease: "easeOut" },
-    },
+  /**
+   * Método: handleSelectProject
+   * Explicación: Selecciona un proyecto de la lista y emite sonido de experiencia.
+   * @param {number} id - Identificador del proyecto
+   */
+  const handleSelectProject = (id) => {
+    playMinecraftExp();
+    setActiveProjectId(id);
+  };
+
+  /**
+   * Método: handleActionClick
+   * Explicación: Emite el click sonoro de botón al hacer clic en ver repositorio.
+   */
+  const handleActionClick = () => {
+    playMinecraftClick();
   };
 
   return (
-    <section
-      id="projects"
-      ref={ref}
-      className="min-h-screen text-white px-6 py-20"
-    >
-      <div className="max-w-7xl mx-auto">
-        {/* Contenedor principal con glassmorphism */}
-        <motion.div
-          className="relative border border-cyan-500/30 bg-gradient-to-br from-cyan-950/40 to-slate-900/40 backdrop-blur-xl rounded-2xl p-8 md:p-12 shadow-2xl overflow-hidden"
-          initial={{ opacity: 0, y: 50 }}
-          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
-          transition={{ duration: 0.8 }}
-        >
-          {/* Efectos de fondo */}
-          <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/5 to-blue-500/5 rounded-2xl" />
-          <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-cyan-400/10 to-blue-400/10 rounded-full blur-3xl" />
-          <div className="absolute bottom-0 left-0 w-32 h-32 bg-gradient-to-tr from-purple-400/10 to-pink-400/10 rounded-full blur-3xl" />
-
-          <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            animate={isInView ? "visible" : "hidden"}
-            className="relative z-10"
+    <section id="projects" ref={ref} className="min-h-screen px-2.5 sm:px-4 py-16 sm:py-20">
+      <div className="max-w-6xl mx-auto">
+        
+        {/* ====================================================================
+            Sección: Título Temático
+            ==================================================================== */}
+        <div className="text-center mb-8 sm:mb-10">
+          <span
+            className={`font-['VT323'] text-lg sm:text-xl mc-text-shadow ${
+              isDark ? "text-[#55ffff]" : "text-[#0d6978]"
+            }`}
           >
-            {/* Título principal */}
-            <motion.div variants={itemVariants} className="text-center mb-16">
-              <h2 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
-                {t.projects.title}
-              </h2>
-              <motion.div
-                className="w-20 h-1 bg-gradient-to-r from-cyan-400 to-blue-400 mx-auto rounded-full"
-                initial={{ width: 0 }}
-                animate={isInView ? { width: 80 } : { width: 0 }}
-                transition={{ delay: 0.5, duration: 0.8 }}
-              />
-            </motion.div>
+            {t.projects.subtitleTag || "[ COFRE DE PROYECTOS // RECETAS CRAFTEADAS ]"}
+          </span>
+          <h2
+            className={`font-['VT323'] text-4xl sm:text-5xl md:text-6xl mc-text-shadow mt-1 ${
+              isDark ? "text-white" : "text-[#1b1924]"
+            }`}
+          >
+            {t.projects.title.toUpperCase()}
+          </h2>
+          <div className="w-24 sm:w-32 h-1.5 bg-[#55ffff] mx-auto mt-2 shadow-[0_0_8px_#55ffff]" />
+        </div>
 
-            {/* Grid de proyectos */}
-            <motion.div
-              className="grid lg:grid-cols-2 gap-8 mb-12"
-              variants={containerVariants}
-            >
-              {projects.map((project) => (
-                <motion.div
-                  key={project.id}
-                  variants={projectCardVariants}
-                  whileHover={{
-                    scale: 1.02,
-                    boxShadow: "0 25px 50px rgba(6, 182, 212, 0.15)",
-                  }}
-                  className="group relative bg-slate-800/30 rounded-xl border border-slate-700/50 overflow-hidden h-full"
-                >
-                  {/* Efecto de brillo en hover */}
-                  <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/5 to-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+        {/* ====================================================================
+            Sección: Selector de Ítems / Pestañas de Proyectos Responsivas
+            ==================================================================== */}
+        <div className="flex flex-wrap justify-center gap-2 sm:gap-3 mb-6 sm:mb-8">
+          {projectBaseData.map((project) => {
+            const isSelected = project.id === activeProjectId;
+            const projectText = t.projects.items.find((item) => item.id === project.id) || {};
+            return (
+              <button
+                key={project.id}
+                onClick={() => handleSelectProject(project.id)}
+                className={`mc-btn text-base sm:text-xl py-2 px-3.5 sm:px-5 flex items-center justify-center gap-2 transition-transform w-full sm:w-auto ${
+                  isSelected ? "bg-[#387a31] text-[#ffff55] border-white scale-102 sm:scale-105" : ""
+                }`}
+              >
+                <span>{project.icon}</span>
+                <span>{projectText.title || "Project"}</span>
+                <span className="text-xs px-1.5 py-0.5 bg-black/40 text-[#55ffff] font-mono">
+                  {projectText.type || "App"}
+                </span>
+              </button>
+            );
+          })}
+        </div>
 
-                  {/* Imagen del proyecto */}
-                  <div className="relative h-48 overflow-hidden">
-                    <motion.img
-                      src={project.image}
-                      alt={`${project.title} - Screenshot del proyecto`}
-                      className="w-full h-full object-cover object-[60%_20%]"
-                      whileHover={{ scale: 1.05 }}
-                      transition={{ duration: 0.3 }}
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-transparent to-transparent" />
+        {/* ====================================================================
+            Sección: Panel de Inspección de Lore Adaptable a Móviles
+            ==================================================================== */}
+        <div className="mc-panel-theme p-3.5 sm:p-6 md:p-8 relative">
+          <div className="grid lg:grid-cols-12 gap-8 items-center">
+            
+            {/* Columna Izquierda (7 cols): Captura del Ítem */}
+            <div className="lg:col-span-7">
+              <div className="p-3 mc-card-inner shadow-2xl relative">
+                <div className="absolute top-5 left-5 z-10 bg-[#14121a]/90 border border-black px-2.5 py-1 text-xs font-['VT323'] text-[#55ff55]">
+                  {t.projects.previewLabel || "✦ Render del Proyecto"}
+                </div>
 
-                    {/* Badge del tipo de proyecto */}
-                    <div className="absolute top-4 left-4">
-                      <span
-                        className={`px-3 py-1 rounded-full text-xs font-medium backdrop-blur-sm ${
-                          project.type === "web"
-                            ? "bg-blue-500/20 text-blue-300 border border-blue-400/30"
-                            : "bg-green-500/20 text-green-300 border border-green-400/30"
-                        }`}
-                      >
-                        {project.type === "web" ? t.projects.webBadge : t.projects.mobileBadge}
-                      </span>
-                    </div>
+                <div className="aspect-[16/10] bg-[#0c0b0f] border-2 border-black overflow-hidden flex items-center justify-center">
+                  <img
+                    src={baseActive.image}
+                    alt={translatedItem.title}
+                    className="w-full h-full object-cover object-top hover:scale-105 transition-transform duration-500"
+                  />
+                </div>
+              </div>
+            </div>
 
-                    {/* Icono del proyecto */}
-                    <div className="absolute top-4 right-4 text-2xl">
-                      {project.icon}
-                    </div>
-                  </div>
-
-                  {/* Contenido del proyecto */}
-                  <div className="p-6 relative z-10">
-                    <h3 className="text-2xl font-bold mb-3 text-cyan-400 group-hover:text-cyan-300 transition-colors duration-300">
-                      {project.title}
+            {/* Columna Derecha (5 cols): Ficha de Lore y Encantamientos */}
+            <div className="lg:col-span-5 flex flex-col justify-between">
+              
+              <div className="mc-tooltip p-5 border-2 border-[#a355ff] shadow-2xl">
+                
+                {/* Nombre y Rareza */}
+                <div className="border-b border-[#3b1263] pb-3 mb-3">
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-['VT323'] text-3xl text-[#55ffff] mc-text-shadow">
+                      {translatedItem.title}
                     </h3>
-
-                    <p className="text-gray-300 mb-6 leading-relaxed text-sm">
-                      {project.description}
-                    </p>
-
-                    {/* Tecnologías */}
-                    <div className="mb-6">
-                      <h4 className="text-sm font-semibold mb-3 text-cyan-400">
-                        {t.projects.techTitle}
-                      </h4>
-                      <motion.div
-                        className="flex flex-wrap gap-2"
-                        variants={containerVariants}
-                        initial="hidden"
-                        animate={isInView ? "visible" : "hidden"}
-                      >
-                        {project.technologies.map((tech, techIndex) => (
-                          <motion.div
-                            key={tech.name}
-                            variants={techVariants}
-                            whileHover={{
-                              scale: 1.05,
-                              boxShadow: "0 5px 15px rgba(0, 0, 0, 0.3)",
-                            }}
-                            className={`
-                              group/tech relative overflow-hidden
-                              ${tech.bgColor} ${tech.borderColor}
-                              border px-3 py-1 rounded-lg
-                              cursor-pointer transition-all duration-300
-                              hover:border-opacity-80
-                            `}
-                            style={{ transitionDelay: `${techIndex * 50}ms` }}
-                          >
-                            <div
-                              className={`absolute inset-0 bg-gradient-to-r ${tech.color} opacity-0 group-hover/tech:opacity-20 transition-opacity duration-300`}
-                            />
-                            <span className="text-xs font-medium text-white relative z-10">
-                              {tech.name}
-                            </span>
-                          </motion.div>
-                        ))}
-                      </motion.div>
-                    </div>
-
-                    {/* Botones de acción */}
-                    <div className="gap-3">
-                      <motion.a
-                        href={project.codeLink}
-                        className="flex items-center justify-center gap-2 border-2 border-slate-600 text-gray-300 px-4 py-2 rounded-lg font-medium text-center transition-all duration-300 hover:border-slate-500 hover:bg-slate-700/30"
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        <img
-                          src="/assets/github.svg"
-                          alt="GitHub"
-                          className="w-5 h-5 object-contain"
-                        />
-                        <span className="text-sm font-medium">
-                          {t.projects.viewCode}
-                        </span>
-                      </motion.a>
-                    </div>
+                    <span 
+                      className="text-xs font-mono px-2 py-0.5 border border-black"
+                      style={{ color: baseActive.rarityColor, backgroundColor: '#1b092c' }}
+                    >
+                      {t.projects.rarity?.[baseActive.rarityKey] || "Item Legendario"}
+                    </span>
                   </div>
-                </motion.div>
-              ))}
-            </motion.div>
+                  <p className="text-xs text-[#d0a5ff] font-mono mt-0.5">
+                    {translatedItem.type} • {t.projects.stableVersion || "Versión 1.0 Estable"}
+                  </p>
+                </div>
 
-            {/* Estadísticas de proyectos */}
-            <motion.div
-              variants={itemVariants}
-              className="mb-8 grid grid-cols-2 md:grid-cols-4 gap-4"
-            >
-              {[
-                { label: t.projects.stats.projects, value: "2+", icon: "🚀" },
-                { label: t.projects.stats.technologies, value: "9+", icon: "⚡" },
-                { label: t.projects.stats.platforms, value: "2", icon: "💻" },
-                { label: t.projects.stats.inDevelopment, value: "∞", icon: "🔄" },
-              ].map((stat, index) => (
-                <motion.div
-                  key={stat.label}
-                  className="text-center p-4 bg-slate-800/50 rounded-xl border border-slate-700/50"
-                  whileHover={{
-                    scale: 1.05,
-                    backgroundColor: "rgba(51, 65, 85, 0.4)",
-                  }}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={
-                    isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }
-                  }
-                  transition={{ delay: 1.2 + index * 0.1, duration: 0.6 }}
+                {/* Descripción Funcional */}
+                <p className="text-sm text-[#d8d8d8] font-sans leading-relaxed mb-4">
+                  {translatedItem.description}
+                </p>
+
+                {/* Encantamientos del Software */}
+                <div className="mb-4">
+                  <span className="font-['VT323'] text-lg text-[#ffff55] block mb-1">
+                    {t.projects.enchantmentsTitle || "Encantamientos del Software:"}
+                  </span>
+                  <ul className="space-y-1">
+                    {(translatedItem.enchantments || []).map((ench) => (
+                      <li key={ench} className="text-xs sm:text-sm text-[#55ff55] font-mono flex items-center gap-1.5">
+                        <span className="text-[#a355ff]">◆</span> {ench}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                {/* Ingredientes de Crafteo (Stack) */}
+                <div>
+                  <span className="font-['VT323'] text-lg text-[#aaaaaa] block mb-1.5">
+                    {t.projects.ingredientsTitle || "Ingredientes de Crafteo:"}
+                  </span>
+                  <div className="flex flex-wrap gap-1.5">
+                    {baseActive.technologies.map((tech) => (
+                      <span
+                        key={tech}
+                        className="bg-[#201c2b] border border-black px-2 py-0.5 text-xs text-white font-mono"
+                      >
+                        {tech}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+              </div>
+
+              {/* Botón de Acción a GitHub */}
+              <div className="mt-6">
+                <a
+                  href={baseActive.codeLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={handleActionClick}
+                  className="mc-btn mc-btn-green w-full py-3 text-xl flex items-center justify-center gap-2"
                 >
-                  <div className="text-2xl mb-2">{stat.icon}</div>
-                  <div className="text-xl font-bold text-white mb-1">
-                    {stat.value}
-                  </div>
-                  <div className="text-gray-400 text-sm">{stat.label}</div>
-                </motion.div>
-              ))}
-            </motion.div>
-          </motion.div>
-        </motion.div>
+                  <span>🗡️</span>
+                  <span>{t.projects.viewCode}</span>
+                </a>
+              </div>
+
+            </div>
+
+          </div>
+
+          {/* Subsección: Estadísticas Globales del Cofre */}
+          <div className="mt-10 pt-6 border-t-2 border-black grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
+            <div className="mc-card-inner p-3">
+              <span className="font-['VT323'] text-2xl text-[#55ffff]">02</span>
+              <p className={`text-xs font-sans ${isDark ? "text-[#888888]" : "text-[#444444]"}`}>
+                {t.projects.stats.projects}
+              </p>
+            </div>
+            <div className="mc-card-inner p-3">
+              <span className="font-['VT323'] text-2xl text-[#55ff55]">10+</span>
+              <p className={`text-xs font-sans ${isDark ? "text-[#888888]" : "text-[#444444]"}`}>
+                {t.projects.stats.technologies}
+              </p>
+            </div>
+            <div className="mc-card-inner p-3">
+              <span className="font-['VT323'] text-2xl text-[#ffff55]">02</span>
+              <p className={`text-xs font-sans ${isDark ? "text-[#888888]" : "text-[#444444]"}`}>
+                {t.projects.stats.platforms}
+              </p>
+            </div>
+            <div className="mc-card-inner p-3">
+              <span className="font-['VT323'] text-2xl text-[#ff5555]">100%</span>
+              <p className={`text-xs font-sans ${isDark ? "text-[#888888]" : "text-[#444444]"}`}>
+                {t.projects.stats.inDevelopment}
+              </p>
+            </div>
+          </div>
+
+        </div>
+
       </div>
     </section>
   );

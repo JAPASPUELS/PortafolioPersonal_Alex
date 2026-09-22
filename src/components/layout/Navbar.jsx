@@ -1,150 +1,266 @@
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
-import { Languages } from "lucide-react";
 import { useLanguage } from "../../context/LanguageContext";
+import { useTheme } from "../../context/ThemeContext";
+import { playMinecraftClick, playMinecraftExp, toggleMute, getMuteState } from "../../utils/audio";
+// Componente de Bandera Nacional de Ecuador en formato pixel art de Minecraft
+import EcuadorMinecraftFlag from "../ui/EcuadorMinecraftFlag";
 
-const navSections = [
-  { id: "home", key: "home" },
-  { id: "about", key: "about" },
-  { id: "projects", key: "projects" },
-  { id: "experience", key: "experience" },
-  { id: "contact", key: "contact" },
+/**
+ * ============================================================================
+ * Constante: navSectionKeys
+ * Explicación: Claves de sección asociadas con los iconos de Minecraft y
+ * atajos de teclado numéricos (1 al 5).
+ * ============================================================================
+ */
+const navSectionKeys = [
+  { id: "home", key: "home", icon: "🏰", slotNum: "1" },
+  { id: "about", key: "about", icon: "👤", slotNum: "2" },
+  { id: "projects", key: "projects", icon: "🗡️", slotNum: "3" },
+  { id: "experience", key: "experience", icon: "📜", slotNum: "4" },
+  { id: "contact", key: "contact", icon: "✉️", slotNum: "5" },
 ];
 
+/**
+ * ============================================================================
+ * Componente: Navbar (HUD Superior & Hotbar de Minecraft)
+ * Explicación: Proporciona la barra superior con estadísticas del jugador,
+ * barra de EXP de scroll, botón de tema Claro/Oscuro, selector de idioma y sonido,
+ * además de la Hotbar inferior persistente con soporte bilingüe completo.
+ * ============================================================================
+ */
 const Navbar = () => {
   const { language, toggleLanguage, t } = useLanguage();
+  const { theme, toggleTheme, isDark } = useTheme();
   const [activeSection, setActiveSection] = useState("home");
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [scrollProgress, setScrollProgress] = useState(0);
+  const [isMuted, setIsMuted] = useState(false);
 
+  /**
+   * Método: useEffect (Gestión de Scroll, Audio y Teclado)
+   * Explicación: Registra eventos para calcular el progreso de la barra de EXP
+   * y escuchar números del 1 al 5 para saltar entre ranuras de la Hotbar.
+   */
   useEffect(() => {
-    const handleScroll = () => {
-      const sections = navSections.map((item) => document.getElementById(item.id));
-      const scrollPosition = window.scrollY + 100;
+    setIsMuted(getMuteState());
 
-      sections.forEach((section, index) => {
-        if (
-          section &&
-          section.offsetTop <= scrollPosition &&
-          section.offsetTop + section.offsetHeight > scrollPosition
-        ) {
-          setActiveSection(navSections[index].id);
+    const handleScroll = () => {
+      const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = totalHeight > 0 ? (window.scrollY / totalHeight) * 100 : 0;
+      setScrollProgress(Math.min(100, Math.max(0, progress)));
+
+      const scrollPosition = window.scrollY + 200;
+      navSectionKeys.forEach((item) => {
+        const el = document.getElementById(item.id);
+        if (el) {
+          const top = el.offsetTop;
+          const height = el.offsetHeight;
+          if (scrollPosition >= top && scrollPosition < top + height) {
+            setActiveSection(item.id);
+          }
         }
       });
     };
 
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    const handleKeyDown = (e) => {
+      const num = parseInt(e.key, 10);
+      if (num >= 1 && num <= navSectionKeys.length) {
+        const target = navSectionKeys[num - 1];
+        if (target) {
+          playMinecraftClick();
+          scrollToSection(target.id);
+        }
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("keydown", handleKeyDown);
+    };
   }, []);
 
+  /**
+   * Método: scrollToSection
+   * Explicación: Desplaza suavemente la ventana hacia la sección deseada emitiendo click sonoro.
+   * @param {string} sectionId - ID del contenedor objetivo
+   */
   const scrollToSection = (sectionId) => {
-    document.getElementById(sectionId)?.scrollIntoView({
-      behavior: "smooth",
-    });
+    playMinecraftClick();
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
+  /**
+   * Método: handleThemeToggle
+   * Explicación: Alterna entre el tema Claro (Día Overworld) y Oscuro (Noche Bedrock) con sonido.
+   */
+  const handleThemeToggle = () => {
+    playMinecraftClick();
+    toggleTheme();
+  };
+
+  /**
+   * Método: handleSoundToggle
+   * Explicación: Conmuta el estado de silencio y reproduce sonido de EXP si se desmutea.
+   */
+  const handleSoundToggle = () => {
+    const newState = toggleMute();
+    setIsMuted(newState);
+    if (!newState) {
+      playMinecraftExp();
+    }
+  };
+
+  /**
+   * Método: handleLanguageToggle
+   * Explicación: Cambia entre Español e Inglés y reproduce click procedural.
+   */
+  const handleLanguageToggle = () => {
+    playMinecraftClick();
+    toggleLanguage();
   };
 
   return (
-    <motion.nav
-      initial={{ y: -100 }}
-      animate={{ y: 0 }}
-      className="fixed top-0 w-full bg-cyan-950/80 backdrop-blur-md z-50 border-b border-cyan-950/80"
-    >
-      <div className="container mx-auto px-6 py-4">
-        <div className="flex justify-between items-center">
-          {/* Logo */}
-          <div className="flex items-center">
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-blue-600 to-red-600 hidden sm:block"
-            >
-              {t.navbar.brand}
-            </motion.div>
-            <img
-              src="/assets/ecuador-flag-icon.svg"
-              alt="Bandera de Ecuador"
-              className="w-8 h-8 ml-2"
-            />
+    <>
+      {/* ======================================================================
+          Sección: HUD Superior (Vida, Barra de EXP, Tema, Idioma y Sonido)
+          ====================================================================== */}
+      <header
+        className={`fixed top-0 left-0 right-0 z-40 border-b-2 border-black select-none transition-colors duration-300 ${
+          isDark ? "bg-[#14121a]/90 backdrop-blur-md" : "bg-[#c6c6c6]/95 backdrop-blur-md"
+        }`}
+      >
+        <div className="max-w-6xl mx-auto px-2.5 sm:px-4 py-1.5 sm:py-2 flex items-center justify-between gap-2 sm:gap-4">
+          
+          {/* Subsección: Identificador del Jugador, Bandera Ecuatoriana y Corazones */}
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+            {/* Bandera Nacional de Ecuador adaptada a móviles y pantallas grandes */}
+            <EcuadorMinecraftFlag className="w-8 h-6 sm:w-11 sm:h-8" />
+
+            <div className="flex flex-col min-w-0">
+              <div className="flex items-center gap-1.5">
+                <span
+                  className={`font-['VT323'] text-lg sm:text-xl tracking-wider leading-none truncate ${
+                    isDark ? "text-[#e0e0e0] mc-text-shadow" : "text-[#1a1a1a]"
+                  }`}
+                >
+                  {t.navbar.playerTag || "Alex_Paspuels"}
+                </span>
+                <span className="text-[10px] font-mono px-1 py-0.2 bg-[#201d2a] text-[#55ffff] border border-black hidden sm:inline">
+                  EC
+                </span>
+              </div>
+              <div
+                className="flex items-center gap-0.5 text-[10px] sm:text-xs text-[#ff3333] select-none"
+                title={t.navbar.healthTooltip || "Vida: 10/10"}
+              >
+                <span>❤️</span><span>❤️</span><span>❤️</span><span>❤️</span><span>❤️</span>
+              </div>
+            </div>
           </div>
 
-          <div className="flex items-center space-x-4 md:space-x-6">
-            {/* Menú en escritorio */}
-            <div className="hidden md:flex space-x-6">
-              {navSections.map((item) => (
-                <motion.button
-                  key={item.id}
-                  onClick={() => scrollToSection(item.id)}
-                  className={`px-3 py-2 rounded-lg transition-colors font-medium text-sm lg:text-base ${
-                    activeSection === item.id
-                      ? "text-cyan-400 bg-cyan-500/10"
-                      : "text-white hover:text-cyan-300"
-                  }`}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  {t.navbar[item.key]}
-                </motion.button>
-              ))}
+          {/* Subsección: Barra de Experiencia de Scroll */}
+          <div className="flex-1 max-w-md hidden sm:flex flex-col items-center">
+            <span className="font-['VT323'] text-xl text-[#55ff55] mc-text-shadow leading-none mb-1">
+              {t.navbar.level || "Lv. 26"}
+            </span>
+            <div className="w-full h-3 bg-[#0a0a0c] border border-black p-0.5 rounded-[1px] shadow-inner">
+              <div
+                className="h-full bg-gradient-to-r from-[#388e3c] via-[#55ff55] to-[#76ff03] transition-all duration-150 rounded-[1px]"
+                style={{ width: `${scrollProgress}%` }}
+              />
             </div>
+          </div>
 
-            {/* Botón de cambio de idioma a la derecha */}
-            <motion.button
-              onClick={toggleLanguage}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              aria-label="Cambiar idioma / Change language"
-              className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg border border-cyan-500/40 bg-cyan-950/70 hover:bg-cyan-900/80 text-cyan-300 hover:text-white transition-all duration-200 text-xs sm:text-sm font-bold shadow-sm shadow-cyan-500/20 cursor-pointer"
+          {/* Subsección: Botones de Configuración (Tema, Audio e Idioma) */}
+          <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
+            {/* Botón de Tema Claro / Oscuro */}
+            <button
+              onClick={handleThemeToggle}
+              title={isDark ? t.navbar.themeDay : t.navbar.themeNight}
+              className="mc-btn text-xs sm:text-base py-1 px-1.5 sm:px-2.5 flex items-center gap-1"
             >
-              <Languages className="w-4 h-4 text-cyan-400" />
-              <span>{language.toUpperCase()}</span>
-            </motion.button>
+              <span>{isDark ? "☀️" : "🌙"}</span>
+              <span className="hidden md:inline text-xs font-mono">
+                {isDark ? "DÍA" : "NOCHE"}
+              </span>
+            </button>
 
-            {/* Botón hamburguesa con animación */}
-            <motion.button
-              className="md:hidden text-white ml-2 text-2xl"
-              onClick={() => setMenuOpen(!menuOpen)}
-              whileTap={{ rotate: 90, scale: 0.9 }}
-              animate={{ rotate: menuOpen ? 90 : 0 }}
-              transition={{ type: "spring", stiffness: 200 }}
+            {/* Botón de Sonido Mute/Unmute */}
+            <button
+              onClick={handleSoundToggle}
+              title={isMuted ? t.navbar.soundUnmute : t.navbar.soundMute}
+              className="mc-btn text-xs sm:text-base py-1 px-1.5 sm:px-2.5 flex items-center gap-1"
             >
-              ☰
-            </motion.button>
+              <span>{isMuted ? "🔇" : "🔊"}</span>
+            </button>
+
+            {/* Botón de Idioma (ES / EN) */}
+            <button
+              onClick={handleLanguageToggle}
+              title="Cambiar idioma / Switch language"
+              className="mc-btn text-xs sm:text-base py-1 px-2 sm:px-3 flex items-center gap-1"
+            >
+              <span className="text-[#55ffff]">🌐</span>
+              <span className="font-bold">{language.toUpperCase()}</span>
+            </button>
           </div>
         </div>
+      </header>
 
-        {/* Menú desplegable móvil con animación */}
-        <AnimatePresence>
-          {menuOpen && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: "auto", opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.4, ease: "easeInOut" }}
-              className="overflow-hidden md:hidden mt-4"
-            >
-              <div className="flex flex-col space-y-2 px-4 pb-4">
-                {navSections.map((item) => (
-                  <motion.button
-                    key={item.id}
-                    onClick={() => {
-                      setMenuOpen(false);
-                      setTimeout(() => scrollToSection(item.id), 300);
-                    }}
-                    className={`px-4 py-2 rounded-lg text-left transition-colors ${
-                      activeSection === item.id
-                        ? "text-cyan-500 bg-accent/10 font-semibold"
-                        : "text-white hover:text-cyan-300"
-                    }`}
-                    whileHover={{ scale: 1.03 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    {t.navbar[item.key]}
-                  </motion.button>
-                ))}
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
-    </motion.nav>
+      {/* ======================================================================
+          Sección: Hotbar Inferior Adaptable a Móviles (5 Ranuras Rápidas)
+          ====================================================================== */}
+      <nav
+        aria-label="Minecraft Hotbar"
+        className="fixed bottom-3 sm:bottom-4 left-1/2 -translate-x-1/2 z-50 select-none max-w-[95vw]"
+      >
+        <div
+          className={`flex items-center gap-1 sm:gap-1.5 p-1 sm:p-1.5 border-2 border-black rounded-[2px] shadow-2xl transition-colors duration-300 ${
+            isDark ? "bg-[#404040]" : "bg-[#8f8f8f]"
+          }`}
+        >
+          {navSectionKeys.map((item) => {
+            const isActive = activeSection === item.id;
+            const slotLabel = t.navbar.slots?.[item.key] || t.navbar[item.key];
+
+            return (
+              <motion.button
+                key={item.id}
+                onClick={() => scrollToSection(item.id)}
+                whileHover={{ scale: 1.06 }}
+                whileTap={{ scale: 0.94 }}
+                className={`relative w-11 h-11 sm:w-14 sm:h-14 flex items-center justify-center transition-all ${
+                  isActive
+                    ? "bg-[#6b6b6b] border-2 border-white shadow-[0_0_10px_#ffffff]"
+                    : "mc-slot-theme hover:border-gray-300"
+                }`}
+              >
+                {/* Número de acceso rápido */}
+                <span className="absolute top-0.5 left-1 font-['VT323'] text-xs sm:text-sm text-[#ffff55] mc-text-shadow">
+                  {item.slotNum}
+                </span>
+
+                {/* Icono de la ranura */}
+                <span className="text-lg sm:text-2xl filter drop-shadow">
+                  {item.icon}
+                </span>
+
+                {/* Tooltip visible en pantallas medianas y grandes */}
+                <span className="mc-tooltip absolute -top-10 left-1/2 -translate-x-1/2 px-2 py-0.5 whitespace-nowrap opacity-0 hover:opacity-100 pointer-events-none transition-opacity text-xs sm:text-sm hidden sm:block">
+                  {slotLabel}
+                </span>
+              </motion.button>
+            );
+          })}
+        </div>
+      </nav>
+    </>
   );
 };
 
