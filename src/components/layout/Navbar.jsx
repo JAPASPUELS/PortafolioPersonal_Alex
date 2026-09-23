@@ -9,8 +9,8 @@ import EcuadorMinecraftFlag from "../ui/EcuadorMinecraftFlag";
 /**
  * ============================================================================
  * Constante: navSectionKeys
- * Explicación: Claves de sección asociadas con los iconos de Minecraft y
- * atajos de teclado numéricos (1 al 5).
+ * Explicación: Define las 5 ranuras de inventario rápido (Hotbar) con sus
+ * respectivos identificadores de sección, iconos temáticos y atajos numéricos.
  * ============================================================================
  */
 const navSectionKeys = [
@@ -23,23 +23,25 @@ const navSectionKeys = [
 
 /**
  * ============================================================================
- * Componente: Navbar (HUD Superior & Hotbar de Minecraft)
- * Explicación: Proporciona la barra superior con estadísticas del jugador,
- * barra de EXP de scroll, botón de tema Claro/Oscuro, selector de idioma y sonido,
- * además de la Hotbar inferior persistente con soporte bilingüe completo.
+ * Componente: Navbar (HUD Superior y Hotbar de Minecraft)
+ * Explicación: Barra de navegación completa optimizada para celulares y pantallas grandes:
+ * - HUD superior: Estado de salud del jugador, bandera tricolor, nivel de EXP de scroll,
+ *   y botones compactos para alternar tema Día/Noche, sonido ambiental e idioma.
+ * - Hotbar inferior: Ranuras de acceso directo con adaptación fluida a pantallas pequeñas (320px+).
  * ============================================================================
  */
 const Navbar = () => {
   const { language, toggleLanguage, t } = useLanguage();
-  const { theme, toggleTheme, isDark } = useTheme();
+  const { toggleTheme, isDark } = useTheme();
   const [activeSection, setActiveSection] = useState("home");
   const [scrollProgress, setScrollProgress] = useState(0);
   const [isMuted, setIsMuted] = useState(false);
 
   /**
-   * Método: useEffect (Gestión de Scroll, Audio y Teclado)
-   * Explicación: Registra eventos para calcular el progreso de la barra de EXP
-   * y escuchar números del 1 al 5 para saltar entre ranuras de la Hotbar.
+   * Método: useEffect (Monitoreo de Scroll, Atajos Numéricos y Audio)
+   * Explicación: Monitorea la posición del scroll para actualizar el nivel de EXP,
+   * detecta la sección visible en el viewport y escucha los números del 1 al 5
+   * para saltar rápidamente entre ranuras de la Hotbar.
    */
   useEffect(() => {
     setIsMuted(getMuteState());
@@ -84,8 +86,8 @@ const Navbar = () => {
 
   /**
    * Método: scrollToSection
-   * Explicación: Desplaza suavemente la ventana hacia la sección deseada emitiendo click sonoro.
-   * @param {string} sectionId - ID del contenedor objetivo
+   * Explicación: Desplaza suavemente la ventana hacia la sección deseada emitiendo un sonido de clic.
+   * @param {string} sectionId - ID del contenedor destino
    */
   const scrollToSection = (sectionId) => {
     playMinecraftClick();
@@ -97,7 +99,7 @@ const Navbar = () => {
 
   /**
    * Método: handleThemeToggle
-   * Explicación: Alterna entre el tema Claro (Día Overworld) y Oscuro (Noche Bedrock) con sonido.
+   * Explicación: Alterna entre el tema Claro (Día Overworld) y Oscuro (Noche Bedrock) con feedback auditivo.
    */
   const handleThemeToggle = () => {
     playMinecraftClick();
@@ -106,7 +108,7 @@ const Navbar = () => {
 
   /**
    * Método: handleSoundToggle
-   * Explicación: Conmuta el estado de silencio y reproduce sonido de EXP si se desmutea.
+   * Explicación: Conmuta el estado de silencio global y emite sonido de EXP si se desmutea.
    */
   const handleSoundToggle = () => {
     const newState = toggleMute();
@@ -118,7 +120,7 @@ const Navbar = () => {
 
   /**
    * Método: handleLanguageToggle
-   * Explicación: Cambia entre Español e Inglés y reproduce click procedural.
+   * Explicación: Cambia entre Español e Inglés con sonido de clic.
    */
   const handleLanguageToggle = () => {
     playMinecraftClick();
@@ -128,44 +130,48 @@ const Navbar = () => {
   return (
     <>
       {/* ======================================================================
-          Sección: HUD Superior (Vida, Barra de EXP, Tema, Idioma y Sonido)
+          Sección: HUD Superior Fijo (Stats de Jugador y Botones de Control)
+          Ajustado para evitar desbordamiento horizontal en celulares de 320px+.
           ====================================================================== */}
       <header
-        className={`fixed top-0 left-0 right-0 z-40 border-b-2 border-black select-none transition-colors duration-300 ${
+        className={`fixed top-0 left-0 right-0 z-40 border-b-2 border-black select-none transition-colors duration-300 w-full max-w-full ${
           isDark ? "bg-[#14121a]/90 backdrop-blur-md" : "bg-[#c6c6c6]/95 backdrop-blur-md"
         }`}
       >
-        <div className="max-w-6xl mx-auto px-2.5 sm:px-4 py-1.5 sm:py-2 flex items-center justify-between gap-2 sm:gap-4">
+        <div className="max-w-6xl mx-auto px-2 sm:px-4 py-1.5 sm:py-2 flex items-center justify-between gap-1.5 sm:gap-4 w-full">
           
-          {/* Subsección: Identificador del Jugador, Bandera Ecuatoriana y Corazones */}
-          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-            {/* Bandera Nacional de Ecuador adaptada a móviles y pantallas grandes */}
-            <EcuadorMinecraftFlag className="w-8 h-6 sm:w-11 sm:h-8" />
+          {/* Subsección: Identificador del Jugador, Bandera y Corazones */}
+          <div className="flex items-center gap-1.5 sm:gap-3 min-w-0 flex-shrink">
+            {/* Bandera Nacional de Ecuador adaptada a pantallas pequeñas */}
+            <EcuadorMinecraftFlag className="w-7 h-5 sm:w-11 sm:h-8 flex-shrink-0" />
 
             <div className="flex flex-col min-w-0">
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-1 sm:gap-1.5 min-w-0">
                 <span
-                  className={`font-['VT323'] text-lg sm:text-xl tracking-wider leading-none truncate ${
+                  className={`font-['VT323'] text-base sm:text-xl tracking-wide sm:tracking-wider leading-none truncate max-w-[85px] min-[360px]:max-w-[120px] sm:max-w-none ${
                     isDark ? "text-[#e0e0e0] mc-text-shadow" : "text-[#1a1a1a]"
                   }`}
                 >
                   {t.navbar.playerTag || "Alex_Paspuels"}
                 </span>
-                <span className="text-[10px] font-mono px-1 py-0.2 bg-[#201d2a] text-[#55ffff] border border-black hidden sm:inline">
+                <span className="text-[9px] sm:text-[10px] font-mono px-1 py-0.2 bg-[#201d2a] text-[#55ffff] border border-black hidden sm:inline flex-shrink-0">
                   EC
                 </span>
               </div>
+              {/* Barra de vida en corazones (compacta en celulares) */}
               <div
-                className="flex items-center gap-0.5 text-[10px] sm:text-xs text-[#ff3333] select-none"
+                className="flex items-center gap-0.5 text-[9px] sm:text-xs text-[#ff3333] select-none leading-none mt-0.5"
                 title={t.navbar.healthTooltip || "Vida: 10/10"}
               >
-                <span>❤️</span><span>❤️</span><span>❤️</span><span>❤️</span><span>❤️</span>
+                <span>❤️</span><span>❤️</span><span>❤️</span>
+                <span className="hidden min-[360px]:inline">❤️</span>
+                <span className="hidden min-[360px]:inline">❤️</span>
               </div>
             </div>
           </div>
 
-          {/* Subsección: Barra de Experiencia de Scroll */}
-          <div className="flex-1 max-w-md hidden sm:flex flex-col items-center">
+          {/* Subsección: Barra de Experiencia de Scroll (Visible en tablet y PC) */}
+          <div className="flex-1 max-w-md hidden sm:flex flex-col items-center px-4">
             <span className="font-['VT323'] text-xl text-[#55ff55] mc-text-shadow leading-none mb-1">
               {t.navbar.level || "Lv. 26"}
             </span>
@@ -204,7 +210,7 @@ const Navbar = () => {
             <button
               onClick={handleLanguageToggle}
               title="Cambiar idioma / Switch language"
-              className="mc-btn text-xs sm:text-base py-1 px-2 sm:px-3 flex items-center gap-1"
+              className="mc-btn text-xs sm:text-base py-1 px-1.5 sm:px-2.5 flex items-center gap-1"
             >
               <span className="text-[#55ffff]">🌐</span>
               <span className="font-bold">{language.toUpperCase()}</span>
@@ -215,10 +221,11 @@ const Navbar = () => {
 
       {/* ======================================================================
           Sección: Hotbar Inferior Adaptable a Móviles (5 Ranuras Rápidas)
+          Diseñada para caber con holgura en pantallas de 320px de ancho.
           ====================================================================== */}
       <nav
         aria-label="Minecraft Hotbar"
-        className="fixed bottom-3 sm:bottom-4 left-1/2 -translate-x-1/2 z-50 select-none max-w-[95vw]"
+        className="fixed bottom-2 sm:bottom-4 left-1/2 -translate-x-1/2 z-50 select-none max-w-[98vw] pb-[env(safe-area-inset-bottom)]"
       >
         <div
           className={`flex items-center gap-1 sm:gap-1.5 p-1 sm:p-1.5 border-2 border-black rounded-[2px] shadow-2xl transition-colors duration-300 ${
@@ -233,21 +240,21 @@ const Navbar = () => {
               <motion.button
                 key={item.id}
                 onClick={() => scrollToSection(item.id)}
-                whileHover={{ scale: 1.06 }}
-                whileTap={{ scale: 0.94 }}
-                className={`relative w-11 h-11 sm:w-14 sm:h-14 flex items-center justify-center transition-all ${
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className={`relative w-10 h-10 min-[380px]:w-11 min-[380px]:h-11 sm:w-14 sm:h-14 flex items-center justify-center transition-all ${
                   isActive
                     ? "bg-[#6b6b6b] border-2 border-white shadow-[0_0_10px_#ffffff]"
                     : "mc-slot-theme hover:border-gray-300"
                 }`}
               >
                 {/* Número de acceso rápido */}
-                <span className="absolute top-0.5 left-1 font-['VT323'] text-xs sm:text-sm text-[#ffff55] mc-text-shadow">
+                <span className="absolute top-0.5 left-1 font-['VT323'] text-[11px] sm:text-sm text-[#ffff55] mc-text-shadow leading-none">
                   {item.slotNum}
                 </span>
 
                 {/* Icono de la ranura */}
-                <span className="text-lg sm:text-2xl filter drop-shadow">
+                <span className="text-base min-[380px]:text-lg sm:text-2xl filter drop-shadow">
                   {item.icon}
                 </span>
 

@@ -9,9 +9,11 @@ import { playMinecraftClick, playMinecraftExp } from '../../utils/audio';
 /**
  * ============================================================================
  * Componente: Home (Pantalla de Inicio Estilo Menú de Minecraft)
- * Explicación: Sección de bienvenida temática con título monumental, marco de ítem
- * para el retrato, Splash Text rotado interactivo 100% traducible en tiempo real
- * (ES/EN) y botones de menú de juego con soporte para temas claro y oscuro.
+ * Explicación: Sección de bienvenida temática con título monumental adaptable,
+ * marco de ítem para el retrato del desarrollador, Splash Text rotado interactivo
+ * 100% traducible en tiempo real (ES/EN) con separación vertical dedicada para
+ * evitar colisiones con el subtítulo, y botones de menú de juego con soporte
+ * para temas claro y oscuro, optimizado para celulares pequeños (320px+).
  * ============================================================================
  */
 const Home = () => {
@@ -27,8 +29,8 @@ const Home = () => {
 
   /**
    * Método: handleSplashClick
-   * Explicación: Cicla al siguiente Splash Text al hacer clic en él y reproduce
-   * el tintineo del orbe de experiencia.
+   * Explicación: Avanza a la siguiente frase del Splash Text al hacer clic en él y reproduce
+   * el tintineo característico del orbe de experiencia.
    */
   const handleSplashClick = () => {
     playMinecraftExp();
@@ -37,8 +39,8 @@ const Home = () => {
 
   /**
    * Método: navigateToSection
-   * Explicación: Realiza scroll suave hacia la sección destino con sonido de botón.
-   * @param {string} sectionId - Identificador del elemento en el DOM
+   * Explicación: Realiza scroll suave hacia la sección deseada emitiendo un sonido de botón.
+   * @param {string} sectionId - Identificador del contenedor DOM de destino
    */
   const navigateToSection = (sectionId) => {
     playMinecraftClick();
@@ -49,19 +51,19 @@ const Home = () => {
   const currentSplash = splashList[splashIndex % splashList.length];
 
   return (
-    <SectionWrapper className="flex items-center justify-center pt-24 pb-20" id="home">
+    <SectionWrapper className="flex items-center justify-center pt-20 pb-20 sm:pt-24 sm:pb-24 w-full max-w-full overflow-hidden" id="home">
       <motion.div
         variants={staggerContainer}
         initial="hidden"
         animate="visible"
-        className="container mx-auto px-4 max-w-4xl text-center flex flex-col items-center"
+        className="w-full max-w-4xl mx-auto px-2 sm:px-4 text-center flex flex-col items-center"
       >
         {/* ====================================================================
             Sección: Marco del Ítem (Avatar del Desarrollador)
             ==================================================================== */}
-        <motion.div variants={fadeInUp} className="mb-6 relative">
-          <div className="relative p-2 sm:p-2.5 bg-[#4a2e18] border-4 border-[#241408] shadow-[0_0_20px_rgba(0,0,0,0.6)] inline-block">
-            <div className="relative w-36 h-36 sm:w-48 sm:h-48 md:w-52 md:h-52 bg-[#785b3b] border-2 border-black overflow-hidden shadow-inner">
+        <motion.div variants={fadeInUp} className="mb-5 sm:mb-6 relative">
+          <div className="relative p-1.5 sm:p-2.5 bg-[#4a2e18] border-4 border-[#241408] shadow-[0_0_20px_rgba(0,0,0,0.6)] inline-block">
+            <div className="relative w-32 h-32 sm:w-48 sm:h-48 md:w-52 md:h-52 bg-[#785b3b] border-2 border-black overflow-hidden shadow-inner">
               <img
                 src="/assets/Perfil.jpg"
                 alt="Alexander Paspuels"
@@ -69,40 +71,50 @@ const Home = () => {
               />
             </div>
             {/* Placa con el rol debajo del marco con texto traducido */}
-            <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 bg-[#1c1a24] border border-black px-2.5 sm:px-3 py-0.5 text-xs font-['VT323'] text-[#55ffff] whitespace-nowrap shadow-md">
+            <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 bg-[#1c1a24] border border-black px-2 sm:px-3 py-0.5 text-[11px] sm:text-xs font-['VT323'] text-[#55ffff] whitespace-nowrap shadow-md">
               {t.home.roleBadge || "Ing. Alex Paspuels"}
             </div>
           </div>
         </motion.div>
 
         {/* ====================================================================
-            Sección: Título Monumental y Splash Text Traducible
-            Contenedor con overflow-visible para permitir que el texto inclinado
-            de Minecraft se dibuje sin ser recortado por los bordes.
+            Sección: Título Monumental de Minecraft
+            Explicación: Encabezado principal con escala fluida para dispositivos móviles.
             ==================================================================== */}
-        <motion.div variants={fadeInUp} className="relative mb-6 sm:mb-8 max-w-full px-2 overflow-visible">
-          <h1 className="font-['VT323'] text-4xl sm:text-6xl md:text-7xl lg:text-8xl tracking-tight sm:tracking-wider text-white mc-text-shadow leading-none break-words select-none">
+        <motion.div variants={fadeInUp} className="relative w-full max-w-full px-1">
+          <h1 className="font-['VT323'] text-3xl min-[360px]:text-4xl min-[480px]:text-5xl sm:text-6xl md:text-7xl lg:text-8xl tracking-normal sm:tracking-wider text-white mc-text-shadow leading-tight sm:leading-none break-words select-none max-w-full">
             ALEXANDER PASPUELS
           </h1>
+        </motion.div>
 
-          {/* Contenedor del Splash Text con amplio margen vertical y lateral libre de recortes */}
-          <div className="relative mt-3 sm:mt-5 py-2 sm:py-3 px-4 sm:px-8 overflow-visible flex items-center justify-center">
-            <div
-              onClick={handleSplashClick}
-              className="mc-splash-text cursor-pointer text-base sm:text-2xl md:text-3xl font-bold select-none hover:scale-105 transition-transform max-w-full text-center px-3 py-1"
-              title={t.about.clickToInspect || "Click to change"}
-            >
-              {currentSplash}
-            </div>
+        {/* ====================================================================
+            Sección: Contenedor Aislado del Splash Text Traducible
+            Explicación: Posee altura mínima (min-h-[56px] sm:min-h-[72px]) y márgenes
+            verticales amplios (my-3 sm:my-5, py-3 sm:py-5) para alojar el texto
+            rotado a -10° sin que sus letras inferiores invadan o queden tapadas
+            por el subtítulo inferior.
+            ==================================================================== */}
+        <motion.div
+          variants={fadeInUp}
+          className="relative z-10 my-3 sm:my-5 py-3 sm:py-5 px-3 sm:px-6 flex items-center justify-center w-full max-w-full overflow-visible min-h-[56px] sm:min-h-[72px]"
+        >
+          <div
+            onClick={handleSplashClick}
+            className="mc-splash-text cursor-pointer text-xs min-[360px]:text-sm min-[480px]:text-lg sm:text-2xl md:text-3xl font-bold select-none hover:scale-105 transition-transform max-w-[85vw] text-center px-3 py-1.5 leading-snug"
+            title={t.about.clickToInspect || "Click to change"}
+          >
+            {currentSplash}
           </div>
         </motion.div>
 
         {/* ====================================================================
             Sección: Subtítulo Descriptivo Sensible al Tema
+            Explicación: Ubicado debajo del Splash Text con espacio despejado
+            garantizado (mt-2 sm:mt-3 mb-8 sm:mb-12) para evitar cualquier solapamiento.
             ==================================================================== */}
         <motion.p
           variants={fadeInUp}
-          className={`text-sm sm:text-base md:text-xl font-sans max-w-2xl mx-auto mb-8 sm:mb-10 leading-relaxed drop-shadow px-2 ${
+          className={`relative z-0 text-xs sm:text-base md:text-xl font-sans max-w-2xl mx-auto mt-2 sm:mt-3 mb-8 sm:mb-12 leading-relaxed drop-shadow px-2 break-words ${
             isDark ? "text-[#d0d0d0]" : "text-[#101014] font-medium"
           }`}
         >
@@ -114,32 +126,32 @@ const Home = () => {
             ==================================================================== */}
         <motion.div
           variants={fadeInUp}
-          className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3.5 w-full max-w-xs sm:max-w-md mb-10 sm:mb-12 px-2"
+          className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3.5 w-full max-w-xs sm:max-w-md mb-8 sm:mb-12 px-2"
         >
           <button
             onClick={() => navigateToSection('projects')}
-            className="mc-btn mc-btn-green w-full py-2 sm:py-2.5 text-lg sm:text-xl flex items-center justify-center gap-2"
+            className="mc-btn mc-btn-green w-full py-2 sm:py-2.5 text-base sm:text-xl flex items-center justify-center gap-2"
           >
             <span>{t.home.actions?.projects || t.navbar.projects}</span>
           </button>
 
           <button
             onClick={() => navigateToSection('about')}
-            className="mc-btn w-full py-2 sm:py-2.5 text-lg sm:text-xl flex items-center justify-center gap-2"
+            className="mc-btn w-full py-2 sm:py-2.5 text-base sm:text-xl flex items-center justify-center gap-2"
           >
             <span>{t.home.actions?.about || t.navbar.about}</span>
           </button>
 
           <button
             onClick={() => navigateToSection('experience')}
-            className="mc-btn w-full py-2 sm:py-2.5 text-lg sm:text-xl flex items-center justify-center gap-2"
+            className="mc-btn w-full py-2 sm:py-2.5 text-base sm:text-xl flex items-center justify-center gap-2"
           >
             <span>{t.home.actions?.experience || t.navbar.experience}</span>
           </button>
 
           <button
             onClick={() => navigateToSection('contact')}
-            className="mc-btn w-full py-2 sm:py-2.5 text-lg sm:text-xl flex items-center justify-center gap-2"
+            className="mc-btn w-full py-2 sm:py-2.5 text-base sm:text-xl flex items-center justify-center gap-2"
           >
             <span>{t.home.actions?.contact || t.navbar.contact}</span>
           </button>
@@ -151,7 +163,7 @@ const Home = () => {
         <motion.div
           variants={fadeInUp}
           onClick={() => navigateToSection('about')}
-          className={`cursor-pointer flex flex-col items-center gap-1 font-['VT323'] text-xl animate-bounce hover:scale-105 transition-all ${
+          className={`cursor-pointer flex flex-col items-center gap-1 font-['VT323'] text-lg sm:text-xl animate-bounce hover:scale-105 transition-all select-none ${
             isDark ? "text-[#55ff55]" : "text-[#1a4e15] font-bold"
           }`}
         >
